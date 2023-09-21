@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ContactRow from './ContactRow';
 
 const dummyContacts = [
@@ -7,9 +7,27 @@ const dummyContacts = [
     { id: 3, name: "BB-8", phone: "888-888-8888", email: "bb8@droids.com" },
   ];
 
-export default function ContactList() { 
-const [contacts, setContacts] = useState(dummyContacts);
+export default function ContactList({ setSelectedContactId }) { 
+
+    const [contacts, setContacts] = useState(dummyContacts);
+
 // console.log("Contacts: ", contacts)
+
+    useEffect(()=>{
+        async function fetchContacts() {
+            try {
+                const response = await fetch(
+        "https://fsa-jsonplaceholder-69b5c48f1259.herokuapp.com/users"
+        );
+                const result = await response.json();
+                setContacts(result);
+                } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchContacts();
+    }, []);
+    console.log(contacts);
   return ( 
         <table>
           <thead>
@@ -24,7 +42,8 @@ const [contacts, setContacts] = useState(dummyContacts);
               <td>Phone</td>
             </tr>
             {contacts.map((contact) => {
-                return <ContactRow key={contact.id} contact={contact} />;
+                return <ContactRow key={contact.id} contact={contact} 
+                setContacts={setContacts} setSelectedContactId={setSelectedContactId}/>;
                 // needed to map the prop rather than the array, then 
                 // declare a key so it can sort, then pass the single 
                 // contact into the component as a prop.
